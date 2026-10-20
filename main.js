@@ -145,10 +145,13 @@
   const el = document.getElementById('contribs');
   if (!el) return;
   const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
-  const q = kind => fetch(`https://api.github.com/search/${kind}?q=author:${el.dataset.user}&per_page=100`)
-    .then(r => r.ok ? r.json() : Promise.reject(r.status)).then(d => d.items);
-  // shortcut: first 100 commits + 100 PRs/issues only, paginate if that's ever exceeded
-  Promise.all([q('commits'), q('issues')])
+  // newest first, paging until done; GitHub search stops at 1000 results (10 pages) per query
+  const q = (kind, sort, page = 1) => fetch(`https://api.github.com/search/${kind}?q=author:${el.dataset.user}&sort=${sort}&order=desc&per_page=100&page=${page}`)
+    .then(r => r.ok ? r.json() : Promise.reject(r.status))
+    .then(d => d.items.length === 100 && page < 10
+      ? q(kind, sort, page + 1).catch(() => []).then(more => d.items.concat(more)) // rate-limited mid-way: keep what we have
+      : d.items);
+  Promise.all([q('commits', 'author-date'), q('issues', 'created')])
     .then(([commits, issues]) => {
       const n = {};
       for (const c of commits) n[c.repository.full_name] = (n[c.repository.full_name] || 0) + 1;
