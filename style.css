@@ -97,7 +97,9 @@ button, .btn {
   justify-self: start; font: 600 .9rem "Raleway", sans-serif; letter-spacing: .08em;
   padding: 10px 26px; color: var(--bg); background: var(--fg); border: 0; border-radius: 3px; cursor: pointer;
 }
-.btn { display: inline-block; text-decoration: none; }
+.btn { display: inline-block; text-decoration: none; animation: btn-in .6s cubic-bezier(.7, 0, .2, 1) 1.2s both; } /* wipes in as the page finishes typing */
+@keyframes btn-in { from { clip-path: inset(0 100% 0 0); } to { clip-path: inset(0 0 0 0); } }
+@media (prefers-reduced-motion: reduce) { .btn { animation: none; } }
 .hp { position: absolute; left: -9999px; }
 
 /* foreground flowers at the very bottom, overlapping the box a little */
