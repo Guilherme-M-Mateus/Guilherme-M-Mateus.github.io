@@ -119,3 +119,4 @@ html.wiping::after { content: ""; position: fixed; inset: 0; background: #fff; z
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
 }
+#osaka { display: block; width: 100%; max-width: 340px; margin: 0 auto; }
