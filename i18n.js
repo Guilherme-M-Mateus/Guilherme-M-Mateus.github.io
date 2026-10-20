@@ -108,15 +108,18 @@
   const lang = (navigator.languages || [navigator.language]).map(l => l.slice(0, 2).toLowerCase()).find(l => l === 'en' || T[l]);
   const dict = T[lang] || {};
   window.t = s => dict[s] ?? s;
-  if (!T[lang]) return;
-
-  document.documentElement.lang = lang;
-  const [page, ...rest] = document.title.split(' · ');
-  document.title = [t(page), ...rest].join(' · ');
-  document.querySelectorAll('[aria-label]').forEach(el => el.setAttribute('aria-label', t(el.getAttribute('aria-label'))));
-  const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
-  for (let n; (n = walker.nextNode());) {
-    const key = n.data.trim();
-    if (key && dict[key]) n.data = n.data.replace(key, dict[key]); // keeps surrounding spaces
-  }
+  // translate(root) also runs on content swapped in by the page transitions in main.js
+  window.translate = (root = document.body) => {
+    if (!T[lang]) return;
+    const [page, ...rest] = document.title.split(' · ');
+    document.title = [t(page), ...rest].join(' · ');
+    root.querySelectorAll('[aria-label]').forEach(el => el.setAttribute('aria-label', t(el.getAttribute('aria-label'))));
+    const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+    for (let n; (n = walker.nextNode());) {
+      const key = n.data.trim();
+      if (key && dict[key]) n.data = n.data.replace(key, dict[key]); // keeps surrounding spaces
+    }
+  };
+  if (T[lang]) document.documentElement.lang = lang;
+  translate();
 })();

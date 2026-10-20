@@ -119,4 +119,6 @@ button, .btn {
 
 /* page transitions: the content box fades out/in while the particles morph behind it */
 .box { transition: opacity .45s ease, transform .45s ease; }
-html.arriving .box, html.leaving .box { opacity: 0; transform: translateY(12px); }
+html.leaving .box { opacity: 0; transform: translateY(12px); }
+.box:focus { outline: none; }
+@media (prefers-reduced-motion: reduce) { .box { transition: none; } }

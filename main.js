@@ -1,3 +1,6 @@
+// Per-page setup; runs on load and again after each in-site page swap.
+const onPage = [];
+
 // Foreground flowers at the very bottom of every page (line art, black & white).
 (() => {
   const rnd = i => { const v = Math.sin(i * 91.7) * 43758.5453; return v - Math.floor(v); }; // stable pseudo-random
@@ -63,35 +66,48 @@
       else setTimeout(() => restore.forEach(([wrap, node]) => wrap.replaceWith(node)), 200); // back to plain text nodes
     }, delay);
   };
-  const arriving = document.documentElement.classList.contains('arriving'); // wait for the box to fade in
-  typeIn(document.querySelector('.box'), arriving ? 250 : 0);
+  onPage.push(() => typeIn(document.querySelector('.box')));
 })();
 
-// Page transitions: the box fades out, the particles morph to the next page's shape in plain view, the new box fades in.
+// Page transitions: the box fades out, the next page is fetched and swapped in, the box fades back in.
+// The background never reloads, so the particles morph all the way to the next page's shape.
 (() => {
-  const html = document.documentElement;
-  try { sessionStorage.removeItem('wipe'); } catch (e) {}
-  if (html.classList.contains('arriving')) { void html.offsetWidth; html.classList.remove('arriving'); } // reading layout commits the hidden state, so removing the class fades in
-  if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  const html = document.documentElement, box = document.querySelector('.box');
+  const FADE = matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 450; // matches .box transition in style.css
 
+  async function go(href, push) {
+    if (window.bg) bg.go(bg.pageOf(href));
+    html.classList.add('leaving');
+    try {
+      const [res] = await Promise.all([fetch(href), new Promise(r => setTimeout(r, FADE))]);
+      if (!res.ok) throw res.status;
+      const doc = new DOMParser().parseFromString(await res.text(), 'text/html');
+      if (push) history.pushState(null, '', href);
+      document.title = doc.title;
+      box.innerHTML = doc.querySelector('.box').innerHTML;
+      scrollTo(0, 0);
+      translate(box);
+      onPage.forEach(f => f());
+      box.focus({ preventScroll: true }); // screen readers start reading the new page
+      html.classList.remove('leaving');
+    } catch (e) {
+      location.href = href; // anything odd: plain navigation
+    }
+  }
+
+  box.tabIndex = -1;
   addEventListener('click', e => {
     const a = e.target.closest('a[href]');
     if (!a || e.defaultPrevented || e.button || e.metaKey || e.ctrlKey || e.shiftKey || a.target) return;
-    const next = window.bg ? bg.pageOf(a.href) : -1;
-    if (next < 0 || new URL(a.href).pathname === location.pathname) return;
+    if (!window.bg || bg.pageOf(a.href) < 0 || new URL(a.href).pathname === location.pathname) return;
     e.preventDefault();
-    bg.go(next);
-    html.classList.add('leaving');
-    try { sessionStorage.wipe = 1; } catch (e) {}
-    setTimeout(() => location.href = a.href, 700);
+    go(a.href, true);
   });
-
-  // back/forward cache restores the faded-out page; bring it back
-  addEventListener('pageshow', e => { if (e.persisted) html.classList.remove('leaving'); });
+  addEventListener('popstate', () => go(location.href, false));
 })();
 
 // GitHub contribution board in greyscale (data from a public mirror of the GitHub calendar).
-(() => {
+onPage.push(() => {
   const el = document.getElementById('gh');
   if (!el) return;
   fetch(`https://github-contributions-api.jogruber.de/v4/${el.dataset.user}?y=last`)
@@ -104,10 +120,10 @@
       el.setAttribute('aria-label', `${total.lastYear} GitHub contributions in the last year`);
     })
     .catch(() => el.remove()); // the link below still works
-})();
+});
 
 // Projects: list public, non-fork GitHub repos as cards.
-(() => {
+onPage.push(() => {
   const el = document.getElementById('repos');
   if (!el) return;
   const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
@@ -120,10 +136,10 @@
         : `<p class="muted">${esc(t(el.dataset.empty))}</p>`;
     })
     .catch(() => el.innerHTML = `<p class="muted">${esc(t(el.dataset.empty))}</p>`);
-})();
+});
 
 // Contributions: every repo with my commits, PRs or issues, counted live from GitHub search.
-(() => {
+onPage.push(() => {
   const el = document.getElementById('contribs');
   if (!el) return;
   const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
@@ -145,5 +161,7 @@
       window.typeIn?.(el);
     })
     .catch(() => el.parentElement.remove());
-})();
+});
 
+
+onPage.forEach(f => f());
