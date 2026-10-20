@@ -93,10 +93,11 @@ input, textarea {
 }
 input:focus, textarea:focus { outline: 1px solid var(--fg); }
 textarea { min-height: 150px; resize: vertical; }
-button {
+button, .btn {
   justify-self: start; font: 600 .9rem "Raleway", sans-serif; letter-spacing: .08em;
   padding: 10px 26px; color: var(--bg); background: var(--fg); border: 0; border-radius: 3px; cursor: pointer;
 }
+.btn { display: inline-block; text-decoration: none; }
 .hp { position: absolute; left: -9999px; }
 
 /* foreground flowers at the very bottom, overlapping the box a little */
@@ -119,4 +120,3 @@ html.wiping::after { content: ""; position: fixed; inset: 0; background: #fff; z
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
 }
-#osaka { display: block; width: 100%; max-width: 340px; margin: 0 auto; }

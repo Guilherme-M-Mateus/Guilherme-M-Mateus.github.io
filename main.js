@@ -169,35 +169,3 @@
     .catch(() => el.parentElement.remove());
 })();
 
-// Home: particle portrait, one dot per pixel of osaka.png (greyscale, background transparent), each bobbing.
-(() => {
-  const c = document.getElementById('osaka');
-  if (!c) return;
-  const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const img = new Image();
-  img.onload = () => {
-    const { width: w, height: h } = img, src = document.createElement('canvas');
-    src.width = w; src.height = h;
-    const sg = src.getContext('2d');
-    sg.drawImage(img, 0, 0);
-    const d = sg.getImageData(0, 0, w, h).data;
-    const shades = Array.from({ length: 16 }, () => []); // grouped by grey so fillStyle is set 16x per frame, not per dot
-    for (let i = 0; i < w * h; i++) if (d[i * 4 + 3] > 128)
-      shades[d[i * 4] >> 4].push(i % w, i / w | 0, Math.random() * 6.28);
-    const g = c.getContext('2d');
-    const size = () => { c.width = c.clientWidth * devicePixelRatio; c.height = c.width * h / w; };
-    addEventListener('resize', size);
-    size();
-    (function frame(ms) {
-      const k = c.width / w, t = ms / 1000;
-      g.clearRect(0, 0, c.width, c.height);
-      shades.forEach((dots, s) => {
-        g.fillStyle = `rgb(${s * 17},${s * 17},${s * 17})`;
-        for (let j = 0; j < dots.length; j += 3)
-          g.fillRect(dots[j] * k, (dots[j + 1] + Math.sin(t * 2 + dots[j + 2]) * .35) * k, k * .7, k * .7);
-      });
-      if (!still) requestAnimationFrame(frame);
-    })(0);
-  };
-  img.src = 'osaka.png';
-})();
