@@ -162,7 +162,8 @@
       for (const i of issues) { const r = i.repository_url.split('/repos/')[1]; n[r] = (n[r] || 0) + 1; }
       const rows = Object.entries(n).sort((a, b) => b[1] - a[1]);
       if (!rows.length) return Promise.reject();
-      el.innerHTML = rows.map(([r, c]) => `<li><a class="k" href="https://github.com/${esc(r)}" target="_blank" rel="noopener">${esc(r)}</a><span>${c}</span></li>`).join('');
+      const star = '<svg class="fill" viewBox="0 0 24 24" role="img" aria-label="Most contributed"><path d="M12 2l3.1 6.3 6.9 1-5 4.9 1.2 6.8L12 17.8 5.8 21l1.2-6.8-5-4.9 6.9-1z"/></svg>';
+      el.innerHTML = rows.map(([r, c]) => `<li><a class="k" href="https://github.com/${esc(r)}" target="_blank" rel="noopener">${esc(r)}${c === rows[0][1] ? star : ''}</a><span>${c}</span></li>`).join(''); // ties for first all get the star
       window.typeIn?.(el);
     })
     .catch(() => el.parentElement.remove());
