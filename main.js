@@ -23,44 +23,48 @@
 })();
 
 // Page load: every line in the box types itself out, each letter flashing a display font first.
+// window.typeIn(el) runs the same effect on content added later (e.g. fetched from GitHub).
 (() => {
   if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
   const fonts = ['"Yarndings 12"', 'Sancreek', '"Black Ops One"', '"Shadows Into Light"', '"Lobster Two"'];
-  const walker = document.createTreeWalker(document.querySelector('.box'), NodeFilter.SHOW_TEXT, {
-    acceptNode: n => n.data.trim() && !n.parentElement.closest('textarea, script') ? 1 : 2,
-  });
-  const nodes = [];
-  while (walker.nextNode()) nodes.push(walker.currentNode);
+  const typeIn = window.typeIn = (root, delay = 0) => {
+    const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
+      acceptNode: n => n.data.trim() && !n.parentElement.closest('textarea, script') ? 1 : 2,
+    });
+    const nodes = [];
+    while (walker.nextNode()) nodes.push(walker.currentNode);
 
-  const chars = [], restore = [];
-  for (const node of nodes) {
-    const wrap = document.createElement('span');
-    for (const ch of node.data) {
-      const s = document.createElement('span');
-      s.className = 'tw';
-      s.textContent = ch;
-      wrap.appendChild(s);
-      chars.push(s);
+    const chars = [], restore = [];
+    for (const node of nodes) {
+      const wrap = document.createElement('span');
+      for (const ch of node.data) {
+        const s = document.createElement('span');
+        s.className = 'tw';
+        s.textContent = ch;
+        wrap.appendChild(s);
+        chars.push(s);
+      }
+      restore.push([wrap, node]);
+      node.replaceWith(wrap);
     }
-    restore.push([wrap, node]);
-    node.replaceWith(wrap);
-  }
 
-  const DURATION = 1500; // whole page types in this many ms, by clock so slow frames don't stretch it
-  let i = 0, start;
+    const DURATION = 1500; // whole page types in this many ms, by clock so slow frames don't stretch it
+    let i = 0, start;
+    setTimeout(function tick() {
+      start ??= performance.now();
+      const upTo = Math.min(chars.length, Math.ceil((performance.now() - start) / DURATION * chars.length));
+      for (; i < upTo; i++) {
+        const s = chars[i];
+        s.style.fontFamily = fonts[Math.random() * fonts.length | 0];
+        s.classList.add('on');
+        setTimeout(() => s.style.fontFamily = '', 140);
+      }
+      if (i < chars.length) requestAnimationFrame(tick);
+      else setTimeout(() => restore.forEach(([wrap, node]) => wrap.replaceWith(node)), 200); // back to plain text nodes
+    }, delay);
+  };
   const arriving = document.documentElement.classList.contains('wiping'); // wait for the square reveal
-  setTimeout(function tick() {
-    start ??= performance.now();
-    const upTo = Math.min(chars.length, Math.ceil((performance.now() - start) / DURATION * chars.length));
-    for (; i < upTo; i++) {
-      const s = chars[i];
-      s.style.fontFamily = fonts[Math.random() * fonts.length | 0];
-      s.classList.add('on');
-      setTimeout(() => s.style.fontFamily = '', 140);
-    }
-    if (i < chars.length) requestAnimationFrame(tick);
-    else setTimeout(() => restore.forEach(([wrap, node]) => wrap.replaceWith(node)), 200); // back to plain text nodes
-  }, arriving ? 550 : 0);
+  typeIn(document.querySelector('.box'), arriving ? 550 : 0);
 })();
 
 // Page transitions: white squares cover the screen while the particles morph to the next page's shape.
@@ -159,6 +163,7 @@
       const rows = Object.entries(n).sort((a, b) => b[1] - a[1]);
       if (!rows.length) return Promise.reject();
       el.innerHTML = rows.map(([r, c]) => `<li><a class="k" href="https://github.com/${esc(r)}" target="_blank" rel="noopener">${esc(r)}</a><span>${c}</span></li>`).join('');
+      window.typeIn?.(el);
     })
     .catch(() => el.parentElement.remove());
 })();
