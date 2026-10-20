@@ -24,7 +24,7 @@
       'IT Student · ESCO – Escola de Serviços e Comércio do Oeste': 'Estudante de Informática · ESCO – Escola de Serviços e Comércio do Oeste',
       'Networking, IT support and software development.': 'Redes, suporte informático e desenvolvimento de software.',
       'Certifications': 'Certificações', 'Issued Jul 2026': 'Emitido em jul 2026',
-      'Public repositories on GitHub.': 'Repositórios públicos no GitHub.', 'No public projects yet.': 'Ainda não há projetos públicos.',
+      'Public repositories on GitHub.': 'Repositórios públicos no GitHub.', 'Contributions': 'Contribuições', 'No public projects yet.': 'Ainda não há projetos públicos.',
       'Phone': 'Telefone', 'Send a message': 'Enviar mensagem', 'Name': 'Nome', 'Message': 'Mensagem', 'Send': 'Enviar',
     },
     es: {
@@ -49,7 +49,7 @@
       'IT Student · ESCO – Escola de Serviços e Comércio do Oeste': 'Estudiante de Informática · ESCO – Escola de Serviços e Comércio do Oeste',
       'Networking, IT support and software development.': 'Redes, soporte informático y desarrollo de software.',
       'Certifications': 'Certificaciones', 'Issued Jul 2026': 'Emitido en jul 2026',
-      'Public repositories on GitHub.': 'Repositorios públicos en GitHub.', 'No public projects yet.': 'Todavía no hay proyectos públicos.',
+      'Public repositories on GitHub.': 'Repositorios públicos en GitHub.', 'Contributions': 'Contribuciones', 'No public projects yet.': 'Todavía no hay proyectos públicos.',
       'Email': 'Correo', 'Phone': 'Teléfono', 'Send a message': 'Enviar un mensaje', 'Name': 'Nombre', 'Message': 'Mensaje', 'Send': 'Enviar',
     },
     fr: {
@@ -74,7 +74,7 @@
       'IT Student · ESCO – Escola de Serviços e Comércio do Oeste': 'Étudiant en informatique · ESCO – Escola de Serviços e Comércio do Oeste',
       'Networking, IT support and software development.': 'Réseaux, support informatique et développement logiciel.',
       'Certifications': 'Certifications', 'Issued Jul 2026': 'Délivré en juil. 2026',
-      'Public repositories on GitHub.': 'Dépôts publics sur GitHub.', 'No public projects yet.': 'Pas encore de projets publics.',
+      'Public repositories on GitHub.': 'Dépôts publics sur GitHub.', 'Contributions': 'Contributions', 'No public projects yet.': 'Pas encore de projets publics.',
       'Email': 'E-mail', 'Phone': 'Téléphone', 'Send a message': 'Envoyer un message', 'Name': 'Nom', 'Message': 'Message', 'Send': 'Envoyer',
     },
     de: {
@@ -99,7 +99,7 @@
       'IT Student · ESCO – Escola de Serviços e Comércio do Oeste': 'IT-Schüler · ESCO – Escola de Serviços e Comércio do Oeste',
       'Networking, IT support and software development.': 'Netzwerke, IT-Support und Softwareentwicklung.',
       'Certifications': 'Zertifikate', 'Issued Jul 2026': 'Ausgestellt Juli 2026',
-      'Public repositories on GitHub.': 'Öffentliche Repositories auf GitHub.', 'No public projects yet.': 'Noch keine öffentlichen Projekte.',
+      'Public repositories on GitHub.': 'Öffentliche Repositories auf GitHub.', 'Contributions': 'Beiträge', 'No public projects yet.': 'Noch keine öffentlichen Projekte.',
       'Email': 'E-Mail', 'Phone': 'Telefon', 'Send a message': 'Nachricht senden', 'Name': 'Name', 'Message': 'Nachricht', 'Send': 'Senden',
     },
   };

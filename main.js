@@ -139,3 +139,23 @@
     })
     .catch(() => el.innerHTML = `<p class="muted">${esc(t(el.dataset.empty))}</p>`);
 })();
+
+// Contributions: every repo with my commits, PRs or issues, counted live from GitHub search.
+(() => {
+  const el = document.getElementById('contribs');
+  if (!el) return;
+  const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
+  const q = kind => fetch(`https://api.github.com/search/${kind}?q=author:${el.dataset.user}&per_page=100`)
+    .then(r => r.ok ? r.json() : Promise.reject(r.status)).then(d => d.items);
+  // shortcut: first 100 commits + 100 PRs/issues only, paginate if that's ever exceeded
+  Promise.all([q('commits'), q('issues')])
+    .then(([commits, issues]) => {
+      const n = {};
+      for (const c of commits) n[c.repository.full_name] = (n[c.repository.full_name] || 0) + 1;
+      for (const i of issues) { const r = i.repository_url.split('/repos/')[1]; n[r] = (n[r] || 0) + 1; }
+      const rows = Object.entries(n).sort((a, b) => b[1] - a[1]);
+      if (!rows.length) return Promise.reject();
+      el.innerHTML = rows.map(([r, c]) => `<li><a class="k" href="https://github.com/${esc(r)}" target="_blank" rel="noopener">${esc(r)}</a><span>${c}</span></li>`).join('');
+    })
+    .catch(() => el.parentElement.remove());
+})();
