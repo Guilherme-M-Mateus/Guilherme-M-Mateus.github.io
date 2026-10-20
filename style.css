@@ -109,12 +109,6 @@ button, .btn {
 }
 .flowers svg { width: 100%; height: 100%; display: block; }
 
-/* page transition: white squares cover, then reveal */
-html.wiping::after { content: ""; position: fixed; inset: 0; background: #fff; z-index: 10; }
-.wipe { position: fixed; inset: 0; z-index: 11; display: grid; pointer-events: none; }
-.wipe i { background: #fff; transform: scale(0); transition: transform .28s ease-in-out; }
-.wipe i.in { transform: scale(1.04); }
-
 /* typewriter loader */
 .tw { visibility: hidden; }
 .tw.on { visibility: visible; }
@@ -122,3 +116,7 @@ html.wiping::after { content: ""; position: fixed; inset: 0; background: #fff; z
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
 }
+
+/* page transitions: the content box fades out/in while the particles morph behind it */
+.box { transition: opacity .45s ease, transform .45s ease; }
+html.arriving .box, html.leaving .box { opacity: 0; transform: translateY(12px); }

@@ -63,38 +63,16 @@
       else setTimeout(() => restore.forEach(([wrap, node]) => wrap.replaceWith(node)), 200); // back to plain text nodes
     }, delay);
   };
-  const arriving = document.documentElement.classList.contains('wiping'); // wait for the square reveal
-  typeIn(document.querySelector('.box'), arriving ? 550 : 0);
+  const arriving = document.documentElement.classList.contains('arriving'); // wait for the box to fade in
+  typeIn(document.querySelector('.box'), arriving ? 250 : 0);
 })();
 
-// Page transitions: white squares cover the screen while the particles morph to the next page's shape.
+// Page transitions: the box fades out, the particles morph to the next page's shape in plain view, the new box fades in.
 (() => {
+  const html = document.documentElement;
+  try { sessionStorage.removeItem('wipe'); } catch (e) {}
+  if (html.classList.contains('arriving')) { void html.offsetWidth; html.classList.remove('arriving'); } // reading layout commits the hidden state, so removing the class fades in
   if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-  const SIZE = 70, cols = Math.ceil(innerWidth / SIZE), rows = Math.ceil(innerHeight / SIZE);
-  const wipe = document.createElement('div');
-  wipe.className = 'wipe';
-  wipe.setAttribute('aria-hidden', 'true');
-  wipe.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
-  wipe.style.gridTemplateRows = `repeat(${rows}, 1fr)`;
-  const squares = Array.from({ length: cols * rows }, () => wipe.appendChild(document.createElement('i')));
-  document.body.appendChild(wipe);
-
-  const set = (on, spread) => squares.forEach(s => {
-    s.style.transitionDelay = spread ? Math.random() * spread + 'ms' : '0ms';
-    s.classList.toggle('in', on);
-  });
-
-  // arriving: start fully covered, then dissolve away
-  let arriving = false;
-  try { arriving = !!sessionStorage.wipe; sessionStorage.removeItem('wipe'); } catch (e) {}
-  if (arriving) {
-    squares.forEach(s => s.style.transition = 'none');
-    set(true, 0);
-    document.documentElement.classList.remove('wiping');
-    void wipe.offsetWidth;
-    squares.forEach(s => s.style.transition = '');
-    requestAnimationFrame(() => set(false, 450));
-  }
 
   addEventListener('click', e => {
     const a = e.target.closest('a[href]');
@@ -103,13 +81,13 @@
     if (next < 0 || new URL(a.href).pathname === location.pathname) return;
     e.preventDefault();
     bg.go(next);
-    set(true, 600);
+    html.classList.add('leaving');
     try { sessionStorage.wipe = 1; } catch (e) {}
-    setTimeout(() => location.href = a.href, 950);
+    setTimeout(() => location.href = a.href, 700);
   });
 
-  // back/forward cache restores the covered page; uncover it
-  addEventListener('pageshow', e => { if (e.persisted) set(false, 300); });
+  // back/forward cache restores the faded-out page; bring it back
+  addEventListener('pageshow', e => { if (e.persisted) html.classList.remove('leaving'); });
 })();
 
 // GitHub contribution board in greyscale (data from a public mirror of the GitHub calendar).
