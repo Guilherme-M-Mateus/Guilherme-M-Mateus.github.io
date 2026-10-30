@@ -62,8 +62,8 @@ Deno.serve(async (req) => {
     (await sql`select count(*)::int as n from ${sql("office." + table)}
                where at > now() - make_interval(mins => ${minutes})`)[0].n as number;
   const message = (b: Record<string, unknown>) => {
-    const m = { name: str(b.name, 200), email: str(b.email, 320), message: str(b.message, 10000) };
-    return m.name && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(m.email) && m.message ? m : null;
+    const m = { name: str(b.name, 200), email: str(b.email, 320) || null, message: str(b.message, 10000) };
+    return m.name && (!m.email || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(m.email)) && m.message ? m : null; // email optional
   };
 
   try {
@@ -127,7 +127,7 @@ Deno.serve(async (req) => {
           r = await sql`update office.messages set handled = ${body.handled}, updated_at = now() where id = ${id}`;
         } else {
           const m = message(body);
-          if (!m) return reply({ error: "Name, a valid email and a message are required." }, 400);
+          if (!m) return reply({ error: "Name and message are required, and the email must be valid if given." }, 400);
           r = await sql`update office.messages set ${sql(m)}, updated_at = now() where id = ${id}`;
         }
         return r.count ? reply({ ok: true }) : reply({ error: "not found" }, 404);

@@ -86,7 +86,7 @@ async function act(action, data) {
 function messageForm(m, onCancel) {
   const f = h('form', { className: 'msg msg-form' },
     h('label', {}, 'Name ', h('input', { name: 'name', required: true, maxLength: 200, value: m.name })),
-    h('label', {}, 'Email ', h('input', { name: 'email', type: 'email', required: true, maxLength: 320, value: m.email })),
+    h('label', {}, 'Email (optional) ', h('input', { name: 'email', type: 'email', maxLength: 320, value: m.email ?? '' })),
     h('label', {}, 'Message ', h('textarea', { name: 'message', required: true, maxLength: 10000, value: m.message })),
     h('div', { className: 'actions' },
       h('button', { type: 'submit', textContent: 'Save' }),
@@ -105,7 +105,7 @@ function messageForm(m, onCancel) {
 function messageCard(m) {
   const card = h('article', { className: 'msg' + (m.handled ? ' handled' : '') },
     h('header', {},
-      h('strong', {}, m.name, ' · ', h('a', { href: 'mailto:' + encodeURIComponent(m.email).replace(/%40/g, '@'), textContent: m.email }),
+      h('strong', {}, m.name, ' · ', m.email ? h('a', { href: 'mailto:' + encodeURIComponent(m.email).replace(/%40/g, '@'), textContent: m.email }) : h('span', { className: 'muted', textContent: 'no email' }),
         m.handled ? h('span', { className: 'badge', textContent: 'Handled' }) : null),
       h('span', { textContent: when(m.at) + (m.updated_at ? ' · edited' : '') })),
     h('p', { textContent: m.message }),

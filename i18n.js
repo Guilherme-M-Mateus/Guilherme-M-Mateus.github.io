@@ -25,7 +25,7 @@
       'Networking, IT support and software development.': 'Redes, suporte informático e desenvolvimento de software.',
       'Certifications': 'Certificações', 'Issued Jul 2026': 'Emitido em jul 2026',
       'Public repositories on GitHub.': 'Repositórios públicos no GitHub.', 'Contributions': 'Contribuições', 'No public projects yet.': 'Ainda não há projetos públicos.',
-      'Phone': 'Telefone', 'Send a message': 'Enviar mensagem', 'Name': 'Nome', 'Message': 'Mensagem', 'Send': 'Enviar',
+      'Phone': 'Telefone', 'Send a message': 'Enviar mensagem', 'Name': 'Nome', 'Message': 'Mensagem', 'Send': 'Enviar', '(optional)': '(opcional)',
       "Privacy: this site uses no cookies and doesn't store your IP address. It counts page views (which page, when, and the site that linked you here). Contact form messages are emailed to me through FormSubmit, and a copy is kept in my private database (Supabase, EU). Ask me and I'll delete yours.": "Privacidade: este site não usa cookies nem guarda o teu endereço IP. Conta as visualizações de páginas (que página, quando e o site que te trouxe aqui). As mensagens do formulário de contacto chegam-me por email através do FormSubmit, e uma cópia fica guardada na minha base de dados privada (Supabase, UE). Pede-me e apago a tua.",
     },
     es: {
@@ -51,7 +51,7 @@
       'Networking, IT support and software development.': 'Redes, soporte informático y desarrollo de software.',
       'Certifications': 'Certificaciones', 'Issued Jul 2026': 'Emitido en jul 2026',
       'Public repositories on GitHub.': 'Repositorios públicos en GitHub.', 'Contributions': 'Contribuciones', 'No public projects yet.': 'Todavía no hay proyectos públicos.',
-      'Email': 'Correo', 'Phone': 'Teléfono', 'Send a message': 'Enviar un mensaje', 'Name': 'Nombre', 'Message': 'Mensaje', 'Send': 'Enviar',
+      'Email': 'Correo', 'Phone': 'Teléfono', 'Send a message': 'Enviar un mensaje', 'Name': 'Nombre', 'Message': 'Mensaje', 'Send': 'Enviar', '(optional)': '(opcional)',
       "Privacy: this site uses no cookies and doesn't store your IP address. It counts page views (which page, when, and the site that linked you here). Contact form messages are emailed to me through FormSubmit, and a copy is kept in my private database (Supabase, EU). Ask me and I'll delete yours.": "Privacidad: este sitio no usa cookies ni guarda tu dirección IP. Cuenta las visitas a cada página (qué página, cuándo y el sitio desde el que llegaste). Los mensajes del formulario de contacto me llegan por correo a través de FormSubmit, y se guarda una copia en mi base de datos privada (Supabase, UE). Pídemelo y borraré el tuyo.",
     },
     fr: {
@@ -77,7 +77,7 @@
       'Networking, IT support and software development.': 'Réseaux, support informatique et développement logiciel.',
       'Certifications': 'Certifications', 'Issued Jul 2026': 'Délivré en juil. 2026',
       'Public repositories on GitHub.': 'Dépôts publics sur GitHub.', 'Contributions': 'Contributions', 'No public projects yet.': 'Pas encore de projets publics.',
-      'Email': 'E-mail', 'Phone': 'Téléphone', 'Send a message': 'Envoyer un message', 'Name': 'Nom', 'Message': 'Message', 'Send': 'Envoyer',
+      'Email': 'E-mail', 'Phone': 'Téléphone', 'Send a message': 'Envoyer un message', 'Name': 'Nom', 'Message': 'Message', 'Send': 'Envoyer', '(optional)': '(facultatif)',
       "Privacy: this site uses no cookies and doesn't store your IP address. It counts page views (which page, when, and the site that linked you here). Contact form messages are emailed to me through FormSubmit, and a copy is kept in my private database (Supabase, EU). Ask me and I'll delete yours.": "Confidentialité : ce site n’utilise aucun cookie et n’enregistre pas votre adresse IP. Il compte les pages vues (quelle page, quand et le site qui vous a amené ici). Les messages du formulaire de contact me parviennent par e-mail via FormSubmit, et une copie est conservée dans ma base de données privée (Supabase, UE). Demandez-le-moi et je supprimerai le vôtre.",
     },
     de: {
@@ -103,7 +103,7 @@
       'Networking, IT support and software development.': 'Netzwerke, IT-Support und Softwareentwicklung.',
       'Certifications': 'Zertifikate', 'Issued Jul 2026': 'Ausgestellt Juli 2026',
       'Public repositories on GitHub.': 'Öffentliche Repositories auf GitHub.', 'Contributions': 'Beiträge', 'No public projects yet.': 'Noch keine öffentlichen Projekte.',
-      'Email': 'E-Mail', 'Phone': 'Telefon', 'Send a message': 'Nachricht senden', 'Name': 'Name', 'Message': 'Nachricht', 'Send': 'Senden',
+      'Email': 'E-Mail', 'Phone': 'Telefon', 'Send a message': 'Nachricht senden', 'Name': 'Name', 'Message': 'Nachricht', 'Send': 'Senden', '(optional)': '(optional)',
       "Privacy: this site uses no cookies and doesn't store your IP address. It counts page views (which page, when, and the site that linked you here). Contact form messages are emailed to me through FormSubmit, and a copy is kept in my private database (Supabase, EU). Ask me and I'll delete yours.": "Datenschutz: Diese Seite verwendet keine Cookies und speichert deine IP-Adresse nicht. Sie zählt Seitenaufrufe (welche Seite, wann und von welcher Website du kamst). Nachrichten über das Kontaktformular erhalte ich per E-Mail über FormSubmit, und eine Kopie wird in meiner privaten Datenbank (Supabase, EU) gespeichert. Sag mir Bescheid, und ich lösche deine.",
     },
   };
