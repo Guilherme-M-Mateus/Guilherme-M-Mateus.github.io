@@ -103,7 +103,6 @@ Deno.serve(async (req) => {
 
       case "stats":
       case "logout":
-      case "msg_create":
       case "msg_update":
       case "msg_delete": {
         const token = (req.headers.get("authorization") ?? "").replace(/^Bearer /, "");
@@ -116,11 +115,6 @@ Deno.serve(async (req) => {
         }
         if (body.action === "stats") return reply((await sql`select office.stats() as s`)[0].s);
 
-        if (body.action === "msg_create") {
-          const m = message(body);
-          if (!m) return reply({ error: "Name, a valid email and a message are required." }, 400);
-          return reply((await sql`insert into office.messages ${sql(m)} returning id`)[0]);
-        }
         const id = Number(body.id);
         if (!Number.isSafeInteger(id) || id < 1) return reply({ error: "bad id" }, 400);
         if (body.action === "msg_delete") {

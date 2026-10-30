@@ -83,21 +83,20 @@ async function act(action, data) {
   }
 }
 
-function messageForm(m, onDone) {
+function messageForm(m, onCancel) {
   const f = h('form', { className: 'msg msg-form' },
-    h('label', {}, 'Name ', h('input', { name: 'name', required: true, maxLength: 200, value: m?.name ?? '' })),
-    h('label', {}, 'Email ', h('input', { name: 'email', type: 'email', required: true, maxLength: 320, value: m?.email ?? '' })),
-    h('label', {}, 'Message ', h('textarea', { name: 'message', required: true, maxLength: 10000, value: m?.message ?? '' })),
+    h('label', {}, 'Name ', h('input', { name: 'name', required: true, maxLength: 200, value: m.name })),
+    h('label', {}, 'Email ', h('input', { name: 'email', type: 'email', required: true, maxLength: 320, value: m.email })),
+    h('label', {}, 'Message ', h('textarea', { name: 'message', required: true, maxLength: 10000, value: m.message })),
     h('div', { className: 'actions' },
-      h('button', { type: 'submit', textContent: m ? 'Save' : 'Add message' }),
-      h('button', { type: 'button', className: 'ghost', textContent: 'Cancel', onclick: onDone })));
+      h('button', { type: 'submit', textContent: 'Save' }),
+      h('button', { type: 'button', className: 'ghost', textContent: 'Cancel', onclick: onCancel })));
   f.addEventListener('submit', async e => {
     e.preventDefault();
     const { name, email, message } = f.elements; // f.name would be the form's own name attribute
     const data = { name: name.value, email: email.value, message: message.value };
     f.querySelector('[type=submit]').disabled = true;
-    if (!await act(m ? 'msg_update' : 'msg_create', m ? { id: m.id, ...data } : data)) f.querySelector('[type=submit]').disabled = false;
-    else if (!m) onDone(); // an edit form is already gone: act() re-rendered the list
+    if (!await act('msg_update', { id: m.id, ...data })) f.querySelector('[type=submit]').disabled = false;
   });
   setTimeout(() => f.elements.name.focus());
   return f;
@@ -120,9 +119,6 @@ function messageCard(m) {
   return card;
 }
 
-$('msg-new').addEventListener('click', () => {
-  if (!$('msg-create').firstChild) $('msg-create').append(messageForm(null, () => $('msg-create').replaceChildren()));
-});
 
 function showError(msg, id) {
   const el = id ? $(id) : document.querySelector('#login .error');

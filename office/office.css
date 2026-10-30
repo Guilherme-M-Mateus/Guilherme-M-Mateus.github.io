@@ -33,5 +33,4 @@ td:not(:first-child), th:not(:first-child) { text-align: right; white-space: now
 .badge { font-size: .7rem; letter-spacing: .1em; text-transform: uppercase; border: 1px solid var(--line); border-radius: 3px; padding: 1px 6px; margin-left: 8px; vertical-align: middle; }
 .msg-form { margin-bottom: 12px; }
 .msg-form .actions { display: flex; gap: 8px; }
-.bar h2 { margin: 0; }
 button.danger:hover, button.danger:focus-visible { background: #ff8080; border-color: #ff8080; color: var(--bg); }
