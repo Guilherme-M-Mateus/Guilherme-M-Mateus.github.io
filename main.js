@@ -1,5 +1,57 @@
+// Clean URLs: GitHub Pages serves /contact for contact.html, so hide the extension in the address bar.
+if (/\.html$/.test(location.pathname))
+  history.replaceState(null, '', location.pathname.replace(/(index)?\.html$/, '') + location.search + location.hash);
+
 // Per-page setup; runs on load and again after each in-site page swap.
 const onPage = [];
+
+// Backend (Supabase edge function): counts page views and keeps a copy of contact messages for /office.
+const API = 'https://rvmhxuvqcgoitxpagxyy.supabase.co/functions/v1/api';
+const api = body => fetch(API, { method: 'POST', keepalive: true, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) }).catch(() => {});
+let firstView = true;
+onPage.push(() => {
+  const ref = firstView && !document.referrer.startsWith(location.origin) ? document.referrer : '';
+  firstView = false;
+  api({ action: 'track', path: location.pathname, referrer: ref });
+});
+// The form still posts to formsubmit (email); keepalive lets this copy finish while the page navigates away.
+addEventListener('submit', e => {
+  const f = e.target;
+  if (f.action.includes('formsubmit.co')) api({ action: 'contact', name: f.name.value, email: f.email.value, message: f.message.value });
+});
+
+// Home: the cat in the corner meows when clicked (synthesised, no audio file).
+let audio;
+addEventListener('click', e => {
+  const cat = e.target.closest('.kitty');
+  if (!cat) return;
+  cat.classList.remove('meow');
+  void cat.offsetWidth; // restart the animation on rapid clicks
+  cat.classList.add('meow');
+  const bubble = document.createElement('span');
+  bubble.className = 'meow-bubble';
+  bubble.textContent = 'meow!';
+  cat.appendChild(bubble);
+  setTimeout(() => bubble.remove(), 1000);
+
+  audio ??= new AudioContext();
+  const t = audio.currentTime, o = audio.createOscillator(), f = audio.createBiquadFilter(), g = audio.createGain();
+  o.type = 'sawtooth';
+  const p = 0.85 + Math.random() * 0.3; // each meow a little different
+  o.frequency.setValueAtTime(420 * p, t);
+  o.frequency.linearRampToValueAtTime(780 * p, t + 0.18);
+  o.frequency.linearRampToValueAtTime(380 * p, t + 0.6);
+  f.type = 'bandpass'; f.Q.value = 4; // sweeping formant: "m-e-ow"
+  f.frequency.setValueAtTime(700, t);
+  f.frequency.linearRampToValueAtTime(1900, t + 0.2);
+  f.frequency.linearRampToValueAtTime(800, t + 0.6);
+  g.gain.setValueAtTime(0, t);
+  g.gain.linearRampToValueAtTime(0.35, t + 0.06);
+  g.gain.setValueAtTime(0.35, t + 0.35);
+  g.gain.exponentialRampToValueAtTime(0.001, t + 0.65);
+  o.connect(f).connect(g).connect(audio.destination);
+  o.start(t); o.stop(t + 0.7);
+});
 
 // Foreground flowers at the very bottom of every page (line art, black & white).
 (() => {
@@ -119,7 +171,8 @@ onPage.push(() => {
       el.setAttribute('role', 'img');
       el.setAttribute('aria-label', `${total.lastYear} GitHub contributions in the last year`);
     })
-    .catch(() => el.remove()); // the link below still works
+    .catch(() => el.remove()) // the link above still works
+    .finally(() => el.closest('.gh-sec')?.classList.remove('loading')); // title + icon appear together with the board
 });
 
 // Projects: list public, non-fork GitHub repos as cards.

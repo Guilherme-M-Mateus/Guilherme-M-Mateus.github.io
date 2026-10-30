@@ -76,6 +76,38 @@ section { margin: 0 0 56px; }
 #repos .card { text-decoration: none; }
 #repos .card h3 { text-decoration: underline; }
 
+/* GitHub heading and board fade in together once the board has loaded */
+.gh-sec { transition: opacity .5s ease; }
+.gh-sec.loading { opacity: 0; }
+
+/* Home: the cat in the box's top-right corner */
+.kitty {
+  position: absolute; top: 14px; right: 14px; width: 52px; height: 52px; padding: 4px;
+  background: none; border-radius: 50%; color: var(--fg); cursor: pointer;
+}
+.kitty:focus-visible { outline: 1px solid var(--fg); }
+.kitty svg { width: 100%; height: 100%; overflow: visible; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+.kitty .eye, .kitty .nose { fill: currentColor; stroke: none; }
+.kitty .ear { transform-box: fill-box; }
+.kitty .ear.l { transform-origin: 100% 100%; }
+.kitty .ear.r { transform-origin: 0 100%; }
+.box:has(.kitty) nav { padding-right: 60px; }
+.kitty.meow svg { animation: kitty-hop .6s cubic-bezier(.3, 1.6, .5, 1); }
+.kitty.meow .ear.l { animation: ear-l .6s ease; }
+.kitty.meow .ear.r { animation: ear-r .6s ease; }
+.kitty.meow .eye { animation: blink .6s ease; transform-box: fill-box; transform-origin: center; }
+@keyframes kitty-hop { 0% { transform: none; } 30% { transform: translateY(-8px) scale(1.08, .94) rotate(-6deg); } 60% { transform: translateY(0) scale(.96, 1.05) rotate(4deg); } 100% { transform: none; } }
+@keyframes ear-l { 30%, 60% { transform: rotate(-14deg); } }
+@keyframes ear-r { 30%, 60% { transform: rotate(14deg); } }
+@keyframes blink { 40% { transform: scaleY(.1); } }
+.meow-bubble {
+  position: absolute; right: 100%; top: -6px; margin-right: 2px; white-space: nowrap; pointer-events: none;
+  font: 400 1.05rem "Shadows Into Light", cursive; color: var(--fg);
+  animation: bubble 1s ease forwards;
+}
+@keyframes bubble { from { opacity: 0; transform: translate(8px, 6px) scale(.6); } 20% { opacity: 1; transform: none; } 75% { opacity: 1; } to { opacity: 0; transform: translateY(-10px); } }
+@media (prefers-reduced-motion: reduce) { .kitty.meow svg, .kitty.meow .ear, .kitty.meow .eye, .meow-bubble { animation: none; } }
+
 /* GitHub contributions, greyscale */
 .gh { display: grid; grid-template-rows: repeat(7, 10px); grid-auto-flow: column; grid-auto-columns: 10px; gap: 3px; overflow-x: auto; padding-bottom: 6px; margin-bottom: .8em; }
 .gh i { border-radius: 2px; }

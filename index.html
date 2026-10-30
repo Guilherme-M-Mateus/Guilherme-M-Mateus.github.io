@@ -12,12 +12,19 @@
 <body>
 <canvas id="bg" aria-hidden="true"></canvas>
 <main class="box">
+<button class="kitty" type="button" aria-label="Pet the cat"><svg viewBox="0 0 64 64" aria-hidden="true">
+  <path class="ear l" d="M14 26 L12 6 L28 16"/><path class="ear r" d="M50 26 L52 6 L36 16"/>
+  <path d="M12 26 Q10 14 28 16 Q32 15 36 16 Q54 14 52 26 Q58 50 32 54 Q6 50 12 26Z"/>
+  <ellipse class="eye" cx="23" cy="32" rx="3" ry="4"/><ellipse class="eye" cx="41" cy="32" rx="3" ry="4"/>
+  <path d="M30 39 h4 l-2 2.5z" class="nose"/><path d="M32 41.5 q-3 4 -6 2 M32 41.5 q3 4 6 2"/>
+  <path d="M6 37 l14 2 M6 43 l14 -1 M58 37 l-14 2 M58 43 l-14 -1"/>
+</svg></button>
 <nav aria-label="Main">
-  <a href="index.html" aria-current="page">Home</a>
-  <a href="competencies.html">Competencies</a>
-  <a href="experience.html">Experience</a>
-  <a href="projects.html">Projects</a>
-  <a href="contact.html">Contact</a>
+  <a href="./" aria-current="page">Home</a>
+  <a href="competencies">Competencies</a>
+  <a href="experience">Experience</a>
+  <a href="projects">Projects</a>
+  <a href="contact">Contact</a>
 </nav>
 <section>
   <p class="label">Portfolio</p>
@@ -29,7 +36,7 @@
   <p>My name is Guilherme Mateus. I've been using computers since I was nine years old. I study at <a href="https://www.esco.pt/" target="_blank" rel="noopener">ESCO</a> and have interned at <a href="https://blueoasis.tech/" target="_blank" rel="noopener">blueOASIS</a>. I have experience working with real systems, as well as more conceptual technology.</p>
 </section>
 <section>
-  <a class="btn" href="contact.html">Say hello</a>
+  <a class="btn" href="contact">Say hello</a>
 </section>
 </main>
 <script src="i18n.js"></script>

@@ -88,10 +88,10 @@
     sphere[i * 3] = 2.4 * r * Math.cos(a); sphere[i * 3 + 1] = 2.4 * y; sphere[i * 3 + 2] = 2.4 * r * Math.sin(a);
   }
 
-  const PAGES = ['index.html', 'competencies.html', 'experience.html', 'projects.html', 'contact.html'];
+  const PAGES = ['index', 'competencies', 'experience', 'projects', 'contact'];
   const pageOf = href => {
     const u = new URL(href, location);
-    return u.origin === location.origin ? PAGES.indexOf((u.pathname.split('/').pop() || 'index.html')) : -1;
+    return u.origin === location.origin ? PAGES.indexOf(u.pathname.replace(/^\/|\.html$/g, '') || 'index') : -1;
   };
   const base = [sine, tux, star, sphere, flowers], page = Math.max(0, pageOf(location.href));
   let target = base[page];
