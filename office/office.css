@@ -15,11 +15,8 @@ button.ghost:hover, button.ghost:focus-visible { background: var(--fg); color: v
 .chart { display: flex; align-items: flex-end; gap: 3px; height: 140px; border-bottom: 1px solid var(--line); }
 .chart div { flex: 1; position: relative; height: 100%; }
 .chart i { position: absolute; bottom: 0; left: 0; right: 0; border-radius: 2px 2px 0 0; }
-.chart i.views, .sw.views { background: #7a7a7a; }
-.chart i.uniq, .sw.uniq { background: var(--fg); left: 25%; right: 25%; }
-.legend { font-size: .8rem; margin-top: 8px; }
-.sw { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin: 0 6px 0 12px; vertical-align: middle; }
-.sw:first-child { margin-left: 0; }
+.chart i { background: #9a9a9a; }
+.chart div:hover i { background: var(--fg); }
 
 table { width: 100%; border-collapse: collapse; font-size: .92rem; }
 th, td { text-align: left; padding: 8px 10px 8px 0; border-bottom: 1px solid var(--line); overflow-wrap: anywhere; }
@@ -29,4 +26,12 @@ td:not(:first-child), th:not(:first-child) { text-align: right; white-space: now
 .msg { border: 1px solid var(--line); border-radius: 4px; padding: 14px 16px; margin-bottom: 12px; }
 .msg header { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 6px 16px; margin-bottom: 8px; }
 .msg header span { color: var(--muted); font-size: .85rem; }
-.msg p { white-space: pre-wrap; overflow-wrap: anywhere; margin: 0; }
+.msg p { white-space: pre-wrap; overflow-wrap: anywhere; margin: 0 0 12px; }
+.msg.handled { opacity: .55; }
+.msg .actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.msg .actions button { font-size: .8rem; padding: 4px 12px; }
+.badge { font-size: .7rem; letter-spacing: .1em; text-transform: uppercase; border: 1px solid var(--line); border-radius: 3px; padding: 1px 6px; margin-left: 8px; vertical-align: middle; }
+.msg-form { margin-bottom: 12px; }
+.msg-form .actions { display: flex; gap: 8px; }
+.bar h2 { margin: 0; }
+button.danger:hover, button.danger:focus-visible { background: #ff8080; border-color: #ff8080; color: var(--bg); }

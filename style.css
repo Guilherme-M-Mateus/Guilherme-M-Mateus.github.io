@@ -154,3 +154,6 @@ button, .btn {
 html.leaving .box { opacity: 0; transform: translateY(12px); }
 .box:focus { outline: none; }
 @media (prefers-reduced-motion: reduce) { .box { transition: none; } }
+
+/* privacy note at the foot of every page */
+.privacy { font-size: .75rem; color: var(--muted); margin: 0; max-width: 60ch; }

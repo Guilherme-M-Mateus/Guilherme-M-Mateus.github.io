@@ -43,38 +43,89 @@ async function load() {
   }
   show(true);
 
+  const open = s.messages.filter(m => !m.handled).length;
   $('tiles').replaceChildren(...[
-    [s.unique_ips, 'Unique IPs'], [s.total_views, 'Page views'],
-    [s.unique_today, 'Unique today'], [s.views_today, 'Views today'], [s.messages.length, 'Messages'],
+    [s.total_views, 'Page views'], [s.views_today, 'Views today'], [s.views_7d, 'Last 7 days'],
+    [s.messages.length, 'Messages'], [open, 'Not handled'],
   ].map(([n, label]) => h('div', { className: 'tile' }, h('b', { textContent: n.toLocaleString() }), h('span', { textContent: label }))));
 
   const max = Math.max(1, ...s.daily.map(d => d.views));
   $('chart').replaceChildren(...s.daily.map(d => {
-    const col = h('div', { title: `${d.day}: ${d.views} views, ${d.uniques} unique` });
-    const v = h('i', { className: 'views' }), u = h('i', { className: 'uniq' });
-    v.style.height = d.views / max * 100 + '%';
-    u.style.height = d.uniques / max * 100 + '%';
-    col.append(v, u);
+    const col = h('div', { title: `${d.day}: ${d.views} view${d.views === 1 ? '' : 's'}` }), bar = h('i');
+    bar.style.height = d.views / max * 100 + '%';
+    col.append(bar);
     return col;
   }));
   $('chart').setAttribute('aria-label', `Daily views for the last 30 days, ${s.daily.reduce((a, d) => a + d.views, 0)} in total`);
 
   const rows = (tbody, items, cells, empty) => $(tbody).replaceChildren(...(items.length
     ? items.map(it => h('tr', {}, ...cells(it).map(c => h('td', { textContent: c }))))
-    : [h('tr', {}, h('td', { textContent: empty, colSpan: 4, className: 'muted' }))]));
-  rows('pages', s.pages, p => [p.path, p.views, p.uniques, when(p.last)], 'No visits yet.');
+    : [h('tr', {}, h('td', { textContent: empty, colSpan: 3, className: 'muted' }))]));
+  rows('pages', s.pages, p => [p.path, p.views, when(p.last)], 'No visits yet.');
   rows('refs', s.referrers, r => [r.referrer, r.n], 'No external referrers yet.');
 
   $('msg-count').textContent = `(${s.messages.length})`;
-  $('messages').replaceChildren(...(s.messages.length ? s.messages.map(m => h('article', { className: 'msg' },
-    h('header', {},
-      h('strong', {}, m.name, ' · ', h('a', { href: 'mailto:' + encodeURIComponent(m.email).replace(/%40/g, '@'), textContent: m.email })),
-      h('span', { textContent: when(m.at) })),
-    h('p', { textContent: m.message }))) : [h('p', { className: 'muted', textContent: 'No messages yet. Messages sent before the backoffice existed only live in your email.' })]));
+  $('messages').replaceChildren(...(s.messages.length ? s.messages.map(messageCard)
+    : [h('p', { className: 'muted', textContent: 'No messages yet. Messages sent before the backoffice existed only live in your email.' })]));
 }
 
-function showError(msg) {
-  const el = document.querySelector('.error');
+// Messages CRUD: every change goes to the API, then the whole dashboard reloads from the server.
+async function act(action, data) {
+  showError('', 'msg-error');
+  try {
+    await call(action, data);
+    await load();
+    return true;
+  } catch (e) {
+    if (e.status === 401) return load(); // session expired: back to login
+    showError(e.message, 'msg-error');
+    return false;
+  }
+}
+
+function messageForm(m, onDone) {
+  const f = h('form', { className: 'msg msg-form' },
+    h('label', {}, 'Name ', h('input', { name: 'name', required: true, maxLength: 200, value: m?.name ?? '' })),
+    h('label', {}, 'Email ', h('input', { name: 'email', type: 'email', required: true, maxLength: 320, value: m?.email ?? '' })),
+    h('label', {}, 'Message ', h('textarea', { name: 'message', required: true, maxLength: 10000, value: m?.message ?? '' })),
+    h('div', { className: 'actions' },
+      h('button', { type: 'submit', textContent: m ? 'Save' : 'Add message' }),
+      h('button', { type: 'button', className: 'ghost', textContent: 'Cancel', onclick: onDone })));
+  f.addEventListener('submit', async e => {
+    e.preventDefault();
+    const { name, email, message } = f.elements; // f.name would be the form's own name attribute
+    const data = { name: name.value, email: email.value, message: message.value };
+    f.querySelector('[type=submit]').disabled = true;
+    if (!await act(m ? 'msg_update' : 'msg_create', m ? { id: m.id, ...data } : data)) f.querySelector('[type=submit]').disabled = false;
+    else if (!m) onDone(); // an edit form is already gone: act() re-rendered the list
+  });
+  setTimeout(() => f.elements.name.focus());
+  return f;
+}
+
+function messageCard(m) {
+  const card = h('article', { className: 'msg' + (m.handled ? ' handled' : '') },
+    h('header', {},
+      h('strong', {}, m.name, ' · ', h('a', { href: 'mailto:' + encodeURIComponent(m.email).replace(/%40/g, '@'), textContent: m.email }),
+        m.handled ? h('span', { className: 'badge', textContent: 'Handled' }) : null),
+      h('span', { textContent: when(m.at) + (m.updated_at ? ' · edited' : '') })),
+    h('p', { textContent: m.message }),
+    h('div', { className: 'actions' },
+      h('button', { type: 'button', className: 'ghost', textContent: m.handled ? 'Mark not handled' : 'Mark handled',
+        onclick: () => act('msg_update', { id: m.id, handled: !m.handled }) }),
+      h('button', { type: 'button', className: 'ghost', textContent: 'Edit',
+        onclick: () => card.replaceWith(messageForm(m, load)) }),
+      h('button', { type: 'button', className: 'ghost danger', textContent: 'Delete',
+        onclick: () => confirm(`Delete the message from ${m.name}? This can't be undone.`) && act('msg_delete', { id: m.id }) })));
+  return card;
+}
+
+$('msg-new').addEventListener('click', () => {
+  if (!$('msg-create').firstChild) $('msg-create').append(messageForm(null, () => $('msg-create').replaceChildren()));
+});
+
+function showError(msg, id) {
+  const el = id ? $(id) : document.querySelector('#login .error');
   el.textContent = msg;
   el.hidden = !msg;
 }

@@ -57,31 +57,40 @@ Deno.serve(async (req) => {
     return reply({ error: "bad request" }, 400);
   }
 
-  const ip = (req.headers.get("x-forwarded-for") ?? "").split(",")[0].trim() || "unknown";
-  const ipHash = await sha256((await cfg("ip_pepper")) + ip); // raw IPs are never stored
-  const recent = async (table: "visits" | "messages" | "login_attempts", minutes: number) =>
+  // Site-wide flood limits: visitors' IPs are never read or stored.
+  const recent = async (table: "visits" | "messages", minutes: number) =>
     (await sql`select count(*)::int as n from ${sql("office." + table)}
-               where ip_hash = ${ipHash} and at > now() - make_interval(mins => ${minutes})`)[0].n as number;
+               where at > now() - make_interval(mins => ${minutes})`)[0].n as number;
+  const message = (b: Record<string, unknown>) => {
+    const m = { name: str(b.name, 200), email: str(b.email, 320), message: str(b.message, 10000) };
+    return m.name && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(m.email) && m.message ? m : null;
+  };
 
   try {
     switch (body.action) {
       case "track": {
         const path = str(body.path, 200);
-        if (!path.startsWith("/") || await recent("visits", 60) >= 300) return reply({ ok: true }); // silently drop junk/floods
-        await sql`insert into office.visits (path, referrer, ip_hash) values (${path}, ${str(body.referrer, 300) || null}, ${ipHash})`;
+        if (!path.startsWith("/") || await recent("visits", 1) >= 600) return reply({ ok: true }); // silently drop junk/floods
+        await sql`insert into office.visits (path, referrer) values (${path}, ${str(body.referrer, 300) || null})`;
         return reply({ ok: true });
       }
 
       case "contact": {
-        const name = str(body.name, 200), email = str(body.email, 320), message = str(body.message, 10000);
-        if (!name || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || !message) return reply({ error: "invalid" }, 400);
-        if (await recent("messages", 60) >= 5) return reply({ error: "slow down" }, 429);
-        await sql`insert into office.messages (name, email, message, ip_hash) values (${name}, ${email}, ${message}, ${ipHash})`;
+        const m = message(body);
+        if (!m) return reply({ error: "invalid" }, 400);
+        if (await recent("messages", 60) >= 30) return reply({ error: "slow down" }, 429);
+        await sql`insert into office.messages ${sql(m)}`;
         return reply({ ok: true });
       }
 
       case "login": {
-        if (await recent("login_attempts", 15) >= 5) return reply({ error: "Too many attempts. Try again in 15 minutes." }, 429);
+        // Office lockout only: a peppered hash of the IP, deleted on successful login.
+        const ip = (req.headers.get("x-forwarded-for") ?? "").split(",")[0].trim() || "unknown";
+        const ipHash = await sha256((await cfg("ip_pepper")) + ip);
+        await sql`delete from office.login_attempts where at < now() - interval '1 day'`;
+        if ((await sql`select count(*)::int as n from office.login_attempts
+                       where ip_hash = ${ipHash} and at > now() - interval '15 minutes'`)[0].n >= 5)
+          return reply({ error: "Too many attempts. Try again in 15 minutes." }, 429);
         await sql`insert into office.login_attempts (ip_hash) values (${ipHash})`;
         if (!await checkPassword(str(body.password, 200))) return reply({ error: "Wrong password." }, 401);
         await sql`delete from office.login_attempts where ip_hash = ${ipHash}`;
@@ -93,7 +102,10 @@ Deno.serve(async (req) => {
       }
 
       case "stats":
-      case "logout": {
+      case "logout":
+      case "msg_create":
+      case "msg_update":
+      case "msg_delete": {
         const token = (req.headers.get("authorization") ?? "").replace(/^Bearer /, "");
         const th = await sha256(token);
         if (!token || !(await sql`select 1 from office.sessions where token_hash = ${th} and expires_at > now()`).length)
@@ -102,7 +114,29 @@ Deno.serve(async (req) => {
           await sql`delete from office.sessions where token_hash = ${th}`;
           return reply({ ok: true });
         }
-        return reply((await sql`select office.stats() as s`)[0].s);
+        if (body.action === "stats") return reply((await sql`select office.stats() as s`)[0].s);
+
+        if (body.action === "msg_create") {
+          const m = message(body);
+          if (!m) return reply({ error: "Name, a valid email and a message are required." }, 400);
+          return reply((await sql`insert into office.messages ${sql(m)} returning id`)[0]);
+        }
+        const id = Number(body.id);
+        if (!Number.isSafeInteger(id) || id < 1) return reply({ error: "bad id" }, 400);
+        if (body.action === "msg_delete") {
+          const r = await sql`delete from office.messages where id = ${id}`;
+          return r.count ? reply({ ok: true }) : reply({ error: "not found" }, 404);
+        }
+        // msg_update: either just the handled flag, or a full edit of the text fields
+        let r;
+        if (typeof body.handled === "boolean" && body.name === undefined) {
+          r = await sql`update office.messages set handled = ${body.handled}, updated_at = now() where id = ${id}`;
+        } else {
+          const m = message(body);
+          if (!m) return reply({ error: "Name, a valid email and a message are required." }, 400);
+          r = await sql`update office.messages set ${sql(m)}, updated_at = now() where id = ${id}`;
+        }
+        return r.count ? reply({ ok: true }) : reply({ error: "not found" }, 404);
       }
     }
     return reply({ error: "bad request" }, 400);

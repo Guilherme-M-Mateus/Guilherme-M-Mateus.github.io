@@ -7,7 +7,7 @@ const onPage = [];
 
 // Backend (Supabase edge function): counts page views and keeps a copy of contact messages for /office.
 const API = 'https://rvmhxuvqcgoitxpagxyy.supabase.co/functions/v1/api';
-const api = body => fetch(API, { method: 'POST', keepalive: true, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) }).catch(() => {});
+const api = body => fetch(API, { method: 'POST', keepalive: true, headers: { 'Content-Type': 'text/plain' }, body: JSON.stringify(body) }).catch(() => {}); // text/plain: no preflight, so keepalive works everywhere
 let firstView = true;
 onPage.push(() => {
   const ref = firstView && !document.referrer.startsWith(location.origin) ? document.referrer : '';
@@ -17,7 +17,8 @@ onPage.push(() => {
 // The form still posts to formsubmit (email); keepalive lets this copy finish while the page navigates away.
 addEventListener('submit', e => {
   const f = e.target;
-  if (f.action.includes('formsubmit.co')) api({ action: 'contact', name: f.name.value, email: f.email.value, message: f.message.value });
+  const { name, email, message } = f.elements; // not f.name: that's the form's own name attribute
+  if (f.action.includes('formsubmit.co')) api({ action: 'contact', name: name.value, email: email.value, message: message.value });
 });
 
 // Home: the cat in the corner meows when clicked (synthesised, no audio file).

@@ -33,12 +33,11 @@
     <section>
       <h2>Last 30 days</h2>
       <div class="chart" id="chart" role="img"></div>
-      <p class="muted legend"><i class="sw views"></i>Views <i class="sw uniq"></i>Unique IPs</p>
     </section>
 
     <section>
       <h2>Pages</h2>
-      <table><thead><tr><th>Page</th><th>Views</th><th>Unique IPs</th><th>Last visit</th></tr></thead><tbody id="pages"></tbody></table>
+      <table><thead><tr><th>Page</th><th>Views</th><th>Last visit</th></tr></thead><tbody id="pages"></tbody></table>
     </section>
 
     <section>
@@ -47,7 +46,12 @@
     </section>
 
     <section>
-      <h2>Messages <span class="muted" id="msg-count"></span></h2>
+      <div class="bar">
+        <h2>Messages <span class="muted" id="msg-count"></span></h2>
+        <button type="button" id="msg-new" class="ghost">New message</button>
+      </div>
+      <p class="error" id="msg-error" role="alert" hidden></p>
+      <div id="msg-create"></div>
       <div id="messages"></div>
     </section>
   </div>
